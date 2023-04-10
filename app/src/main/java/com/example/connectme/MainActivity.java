@@ -87,32 +87,7 @@ public class MainActivity extends AppCompatActivity {
             SmsManager smsManager = SmsManager.getDefault();
             PendingIntent sentIntent = PendingIntent.getBroadcast(this, i, new Intent("SMS_SENT"), 0);
             smsManager.sendTextMessage(contacts.get(i).number, null, message, sentIntent, null);
-
-            BroadcastReceiver smsSentReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    String message = null;
-                    switch (getResultCode()) {
-                        case Activity.RESULT_OK:
-                            message = "Message sent successfully";
-                            break;
-                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            message = "Failed to send message: generic failure";
-                            break;
-                        case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            message = "Failed to send message: no service";
-                            break;
-                        case SmsManager.RESULT_ERROR_NULL_PDU:
-                            message = "Failed to send message: null PDU";
-                            break;
-                        case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            message = "Failed to send message: radio off";
-                            break;
-                    }
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                }
-            };
-            registerReceiver(smsSentReceiver, new IntentFilter("SMS_SENT"));
+            registerReceiver(new MessageSentReceiver(), new IntentFilter("SMS_SENT"));
         }
     }
 
@@ -159,6 +134,31 @@ public class MainActivity extends AppCompatActivity {
             TextView listItemText = (TextView) convertView.findViewById(android.R.id.text1);
             listItemText.setText(contact.name);
             return convertView;
+        }
+    }
+
+    private class MessageSentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = null;
+            switch (getResultCode()) {
+                case Activity.RESULT_OK:
+                    message = "Message sent successfully";
+                    break;
+                case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                    message = "Failed to send message: generic failure";
+                    break;
+                case SmsManager.RESULT_ERROR_NO_SERVICE:
+                    message = "Failed to send message: no service";
+                    break;
+                case SmsManager.RESULT_ERROR_NULL_PDU:
+                    message = "Failed to send message: null PDU";
+                    break;
+                case SmsManager.RESULT_ERROR_RADIO_OFF:
+                    message = "Failed to send message: radio off";
+                    break;
+            }
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
     }
 }
